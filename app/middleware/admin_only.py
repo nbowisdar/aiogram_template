@@ -1,7 +1,7 @@
 from typing import Callable, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import Message
-from src.config.config import admins_id
+from config import admins_id
 
 
 class AdminOnly(BaseMiddleware):
@@ -9,7 +9,7 @@ class AdminOnly(BaseMiddleware):
         self,
         handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
         event: Message,
-        data: dict[str, Any]
+        data: dict[str, Any],
     ) -> Any:
         if event.from_user.id in admins_id:
             return await handler(event, data)

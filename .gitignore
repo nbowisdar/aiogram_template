@@ -3,3 +3,16 @@ venv
 .env
 __pycache__
 test.py
+db.sqlite3
+app.db
+#alembic.ini
+#alembic
+.env
+.idea
+venv
+__pycache__/
+alchemy_test.py
+tes.py
+db.sqlite
+photo/
+test.py
