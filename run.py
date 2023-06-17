@@ -47,6 +47,7 @@ def start_simple():
 
 if __name__ == "__main__":
     try:
+        # create without alembic
         create_tables()
         start_simple()  # run without webhook
         # start_webhook()  # run tg bot

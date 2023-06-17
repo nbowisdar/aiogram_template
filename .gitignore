@@ -16,3 +16,5 @@ tes.py
 db.sqlite
 photo/
 test.py
+alembic.ini
+alembic/
