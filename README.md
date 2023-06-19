@@ -8,10 +8,14 @@ python install_requirements.py
 
 ## Alembic (Migrations)
 
-If you want to use alembic that is highly recommended
-Firstly delete these from .gitignore
-_alembic.ini
-alembic/_
+If you want to use alembic that is highly recommended.
+
+Drop lines from .gitignore:
+
+```
+alembic.ini
+alembic/
+```
 
 Then initialize alembic
 
@@ -23,7 +27,7 @@ Now you need to update config files
 
 env.py -> Add these lines (or similar)
 
-```
+```python
 from app.structure.models import Base
 target_metadata = Base.metadata
 ```
