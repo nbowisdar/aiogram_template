@@ -1,9 +1,8 @@
-from requests import Session
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.structure.models import Base
-from config import settings
+from sqlalchemy.orm import Session, sessionmaker
 
+from src.config import settings
+from src.data.models import Base
 
 # SQLite variant
 engine = create_engine(f"sqlite:///db.sqlite3")

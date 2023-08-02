@@ -1,9 +1,11 @@
-from typing import Any
+from datetime import datetime
 from decimal import Decimal
+from typing import Any
+
 import sqlalchemy as sa
 from sqlalchemy import orm
-from datetime import datetime
-from app.structure import enums, schemas
+
+from . import enums, schemas
 
 
 class Base(orm.DeclarativeBase):

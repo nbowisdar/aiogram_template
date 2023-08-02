@@ -1,8 +1,9 @@
-from setup import bot
 import aiohttp
-from loguru import logger
-from config import admins_id
-from app.structure import models
+
+from src.bot.setup import bot
+from src.config import admins_id
+from src.logger import logger
+from src.data import models
 
 
 def get_status_symbol(b: bool) -> str:

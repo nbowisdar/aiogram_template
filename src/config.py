@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     database_password: str
     database_name: str
     database_username: str
-    env_type: str
+    PROD: bool
     token_bot: str
 
     class Config:

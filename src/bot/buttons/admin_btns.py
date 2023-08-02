@@ -1,6 +1,6 @@
 import aiogram.types as t
-from app import utils
 
+from src.bot import misc
 
 drop_msg = t.InlineKeyboardButton(text="↙️ Приховати", callback_data="hide")
 

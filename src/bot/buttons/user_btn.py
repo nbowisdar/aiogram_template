@@ -1,8 +1,6 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
 import aiogram.types as t
-from setup import periods
-from config import admins_id
+from aiogram.types import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 drop_msg = t.InlineKeyboardButton(text="↙️ Приховати", callback_data="hide")
 

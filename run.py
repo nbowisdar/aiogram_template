@@ -1,15 +1,12 @@
-from app.database import create_tables
-from app.main import run_with_flags
-from setup import bot, dp
-from app.handlers.admin_handlers import admin_router
-from app.handlers.user_handlers import user_router
 import asyncio
-from aiogram.webhook.aiohttp_server import (
-    SimpleRequestHandler,
-    setup_application,
-)
-from loguru import logger
-from app.middleware.admin_only import AdminOnly
+
+from src.logger import logger
+
+from src.bot.db.database import create_tables
+from src.bot.handlers.admin_handlers import admin_router
+from src.bot.handlers.user_handlers import user_router
+from src.bot.middleware.admin_only import AdminOnly
+from src.bot.setup import bot, dp
 
 
 async def _start():
@@ -17,10 +14,11 @@ async def _start():
     dp.include_router(admin_router)
     dp.include_router(user_router)
 
-    await run_with_flags()
+    await dp.start_polling(bot)
 
 
 def start_simple():
+    logger.debug("Starting bot")
     asyncio.run(_start())
 
 

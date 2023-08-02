@@ -1,9 +1,10 @@
 from typing import Annotated
+
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 # from app.structure import models
-from app.database import get_db
+from src.bot.db.database import get_db
 
 # def get_user
 
