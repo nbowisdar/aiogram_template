@@ -19,6 +19,7 @@ class User(Base):
 
     id: orm.Mapped[int] = orm.mapped_column(primary_key=True)
     username: orm.Mapped[str] = orm.mapped_column(sa.String(50))
+    language: orm.Mapped[str] = orm.mapped_column(sa.String(10), default="en")
     status: orm.Mapped[str] = orm.mapped_column(
         sa.String(40), default=enums.AccountStatus.CREATED.value
     )
