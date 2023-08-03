@@ -6,6 +6,7 @@ from aiogram.fsm.state import State, StatesGroup
 from src.bot import misc, msgs
 from src.bot.buttons import user_btn as kb
 from src.bot.db import crud
+from src.bot.db.language import translations
 from src.bot.setup import user_router
 
 
@@ -21,7 +22,9 @@ async def cancel_handler(message: t.Message, state: FSMContext) -> None:
 
 @user_router.message(filters.Command(commands="start"))
 async def main(message: t.Message):
-    await message.answer("🏡 Головна", reply_markup=kb.user_main_kb)
+    user = crud.get_or_create_user_from_msg(message)
+    print(user)
+    await message.answer(translations[user.lang]["start"], reply_markup=kb.user_main_kb)
 
 
 @user_router.message(F.text == "test")

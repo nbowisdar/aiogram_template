@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from functools import wraps
 
 from sqlalchemy import create_engine
@@ -17,29 +18,13 @@ engine = create_engine(f"sqlite:///db.sqlite3")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+@contextmanager
 def get_db() -> Session:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
-
-def auto_commit(commit=False):
-    def decorator(func, db: Session = None):
-        if not db:
-            db = next(get_db())
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            resp = func(db=db, *args, **kwargs)
-            if commit:
-                db.commit()
-            return resp
-
-        return wrapper
-
-    return decorator
 
 
 def create_tables():
