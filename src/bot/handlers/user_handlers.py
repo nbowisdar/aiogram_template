@@ -21,10 +21,11 @@ async def cancel_handler(message: t.Message, state: FSMContext) -> None:
 
 
 @user_router.message(filters.Command(commands="start"))
-async def main(message: t.Message):
+async def main(message: t.Message, data):
     user = crud.get_or_create_user_from_msg(message)
-    print(user)
-    await message.answer(translations[user.lang]["start"], reply_markup=kb.user_main_kb)
+    x = data.get("new_value")
+    await message.answer(x)
+    # await message.answer(translations[user.lang]["start"], reply_markup=kb.user_main_kb)
 
 
 @user_router.message(F.text == "test")

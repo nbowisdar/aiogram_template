@@ -1,12 +1,11 @@
 import asyncio
 
-from src.logger import logger
-
 from src.bot.db.database import create_tables
 from src.bot.handlers.admin_handlers import admin_router
 from src.bot.handlers.user_handlers import user_router
-from src.bot.middleware.admin_only import AdminOnly
+from src.bot.middleware import AdminOnly
 from src.bot.setup import bot, dp
+from src.logger import logger
 
 
 async def _start():
