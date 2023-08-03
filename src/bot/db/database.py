@@ -1,3 +1,5 @@
+from functools import wraps
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -21,6 +23,23 @@ def get_db() -> Session:
         yield db
     finally:
         db.close()
+
+
+def auto_commit(commit=False):
+    def decorator(func, db: Session = None):
+        if not db:
+            db = next(get_db())
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            resp = func(db=db, *args, **kwargs)
+            if commit:
+                db.commit()
+            return resp
+
+        return wrapper
+
+    return decorator
 
 
 def create_tables():

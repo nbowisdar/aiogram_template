@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
 
+WITH_ENV = False
+
 
 class Settings(BaseSettings):
     database_hostname: str
@@ -7,7 +9,6 @@ class Settings(BaseSettings):
     database_password: str
     database_name: str
     database_username: str
-    PROD: bool
     token_bot: str
 
     class Config:
