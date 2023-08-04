@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 
 WITH_ENV = False
 
@@ -21,6 +21,5 @@ settings = Settings()
 
 
 admins_id = [
-    179738472,
     286365412,
 ]

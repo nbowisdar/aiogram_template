@@ -1,9 +1,12 @@
+from pprint import pprint
+
 import aiogram.types as t
 from aiogram import F, filters
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from src.bot.db import msgs
 
-from src.bot import misc, msgs
+from src.bot import misc
 from src.bot.buttons import user_btn as kb
 from src.bot.db import crud
 from src.bot.db.language import translations
@@ -21,11 +24,9 @@ async def cancel_handler(message: t.Message, state: FSMContext) -> None:
 
 
 @user_router.message(filters.Command(commands="start"))
-async def main(message: t.Message, data):
+async def main(message: t.Message):
     user = crud.get_or_create_user_from_msg(message)
-    x = data.get("new_value")
-    await message.answer(x)
-    # await message.answer(translations[user.lang]["start"], reply_markup=kb.user_main_kb)
+    await message.answer(translations[user.lang]["start"], reply_markup=kb.user_main_kb)
 
 
 @user_router.message(F.text == "test")

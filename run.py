@@ -1,9 +1,8 @@
 import asyncio
 
-from src.bot.db.database import create_tables
 from src.bot.handlers.admin_handlers import admin_router
 from src.bot.handlers.user_handlers import user_router
-from src.bot.middleware import AdminOnly
+from src.bot.middleware.admin_only import AdminOnly
 from src.bot.setup import bot, dp
 from src.logger import logger
 
@@ -44,8 +43,6 @@ def start_simple():
 
 if __name__ == "__main__":
     try:
-        # create without alembic
-        create_tables()
         start_simple()  # run without webhook
         # start_webhook()  # run tg bot
     except KeyboardInterrupt:
