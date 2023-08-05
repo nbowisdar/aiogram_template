@@ -14,14 +14,31 @@ def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
     return [buttons[text][lang] for text in btns_text]
 
 
-def _get_info(key: str, btns_text: list[str], lang="en", ajust=3) -> Message_Back:
+def _set_args_to_text(text: str, data: list[str]) -> str:
+    for _, d in enumerate(data):
+        text = text.replace("{}", d, 1)
+    return text
+
+
+def _get_info(
+    key: str, btns_text: list[str], lang: str, ajust: int, *args
+) -> Message_Back:
+    ajust = 3
     btns_text = _set_buttons_text(btns_text, lang)
     btn = kb_builders.build_reply_buttons(btns_text, ajust)
     text = messages[key][lang]
+    if args:
+        text = _set_args_to_text(text, args)
     return Message_Back(text, btn)
 
 
-def user_main_menu(*, lang="en", canceled=False, ajust=3) -> Message_Back:
+def user_main_menu(
+    *,
+    lang="en",
+    canceled=False,
+) -> Message_Back:
+    ajust = 3
+
     if canceled:
         key = "cancel"
     else:
@@ -30,9 +47,17 @@ def user_main_menu(*, lang="en", canceled=False, ajust=3) -> Message_Back:
     return _get_info(key, btns_text, lang, ajust)
 
 
-def user_cancel(lang="en", ajust=4) -> Message_Back:
-    # key = messages["cancel"][lang]
+def user_cancel(lang="en") -> Message_Back:
+    ajust = 3
     key = "cancel"
     btns_text = [key]
 
     return _get_info(key, btns_text, lang, ajust)
+
+
+def balance(lang="en", *args) -> Message_Back:
+    ajust = 2
+    key = "balance"
+    btns_text = ["deposit", "withdraw", "cancel"]
+
+    return _get_info(key, btns_text, lang, ajust, *args)

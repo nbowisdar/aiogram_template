@@ -34,6 +34,13 @@ async def main(message: t.Message):
     await message.answer(info.text, reply_markup=info.kb)
 
 
+@user_router.message(F.text.in_(buttons["balance"].values()))
+async def balance(message: t.Message):
+    user = await cache.get_user(message)
+    info = answers.balance(user.lang, str(user.balance))
+    await message.answer(info.text, reply_markup=info.kb)
+
+
 @user_router.message(F.text == "test")
 async def test(message: t.Message):
     await message.answer("bot works")
