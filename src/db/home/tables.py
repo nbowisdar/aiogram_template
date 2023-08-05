@@ -1,6 +1,14 @@
 from datetime import datetime
 
-from piccolo.columns import BigInt, Boolean, Float, Integer, Timestamp, Varchar
+from piccolo.columns import (
+    BigInt,
+    Boolean,
+    Float,
+    Integer,
+    Timestamp,
+    Varchar,
+    ForeignKey,
+)
 from piccolo.table import Table
 
 
@@ -8,11 +16,23 @@ class User(Table, tablename="users"):
     chat_id = BigInt(unique=True)
     username = Varchar()
     balance = Float(default=0.0)
-    ban = Integer(default=0)
     reg_date = Timestamp(default=datetime.now)
+    lang = Varchar(default="en", length=10)
+    # ban = Integer(default=0)
     # bonus = Float(default=0)
     # bonus_on_id = Float(default=0)
     # transaction_data = Varchar(default="")
+
+
+class Order(Table):
+    # active = IntegerField(default=1)
+    status = Varchar(default="active")
+    seller = ForeignKey(references=User)
+    buyer = ForeignKey(references=User)
+    date = Timestamp(default=datetime.now)
+    status = Varchar(default="active")
+    amount_sell = Float()
+    amount_receive = Float()
 
 
 # class P2P_User(Table, tablename="p2p_users"):

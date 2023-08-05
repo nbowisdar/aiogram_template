@@ -26,12 +26,12 @@ class CRUD_User:
         await User.delete().where(User.chat_id == chat_id)
 
 
-crud_user = CRUD_User()
+# crud_user = CRUD_User()
 
 
-async def test():
-    user = await crud_user.get_user_by_chat_id(123)
+# async def test():
+# user = await crud_user.get_user_by_chat_id(123)
 
 
-if __name__ == "__main__":
-    asyncio.run(test())
+# if __name__ == "__main__":
+# asyncio.run(test())

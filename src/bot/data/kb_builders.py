@@ -10,7 +10,7 @@ from src.bot.data.schema import Text_Data
 drop_msg = t.InlineKeyboardButton(text="↙️ Приховати", callback_data="hide")
 
 
-def build_reply_buttons(buttons_text: list[str], adjast=4) -> t.ReplyKeyboardMarkup:
+def build_reply_buttons(buttons_text: list[str], adjast: int) -> t.ReplyKeyboardMarkup:
     buttons = [t.KeyboardButton(text=text) for text in buttons_text]
     builder = ReplyKeyboardBuilder()
     builder.add(*buttons)

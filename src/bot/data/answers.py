@@ -3,20 +3,25 @@ from src.bot.data.schema import Message_Back
 
 from . import kb_builders
 
-msgs = translations["messages"]
-btns = translations["buttons"]
+messages = translations["messages"]
+buttons = translations["buttons"]
 
 
 # def _get_buttons()
 
 
-def _get_info(key: str, btns_text: list[str], lang="en", ajust=4) -> Message_Back:
+def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
+    return [buttons[text][lang] for text in btns_text]
+
+
+def _get_info(key: str, btns_text: list[str], lang="en", ajust=3) -> Message_Back:
+    btns_text = _set_buttons_text(btns_text, lang)
     btn = kb_builders.build_reply_buttons(btns_text, ajust)
-    text = msgs[key][lang]
+    text = messages[key][lang]
     return Message_Back(text, btn)
 
 
-def user_main_menu(*, lang="en", canceled=False, ajust=4) -> Message_Back:
+def user_main_menu(*, lang="en", canceled=False, ajust=3) -> Message_Back:
     if canceled:
         key = "cancel"
     else:
@@ -26,7 +31,7 @@ def user_main_menu(*, lang="en", canceled=False, ajust=4) -> Message_Back:
 
 
 def user_cancel(lang="en", ajust=4) -> Message_Back:
-    # key = msgs["cancel"][lang]
+    # key = messages["cancel"][lang]
     key = "cancel"
     btns_text = [key]
 
