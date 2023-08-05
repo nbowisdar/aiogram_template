@@ -2,7 +2,8 @@ from pydantic import BaseSettings
 
 WITH_ENV = False
 
-language_file_path = "src/bot/db/language.json"
+language_file_path = "src/bot/data/language.json"
+home_prefix = "src.db.home"
 
 
 class Settings(BaseSettings):

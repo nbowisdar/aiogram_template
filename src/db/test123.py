@@ -1,10 +1,14 @@
 import asyncio
 
 from aiogram.types import Message
+
 from src.db.home.tables import User
 
 
 class CRUD_User:
+    def __init__(self) -> None:
+        self.user = User
+
     @staticmethod
     async def get_user(id: int) -> User | None:
         return await User.objects().get(User.id == id)
@@ -12,6 +16,13 @@ class CRUD_User:
     @staticmethod
     async def get_user_by_chat_id(chat_id: int) -> User | None:
         return await User.objects().get(User.chat_id == chat_id)
+
+    @staticmethod
+    async def get_or_create_user_from_msg(msg: Message) -> User:
+        return await User.objects().get_or_create(
+            User.chat_id == msg.from_user.id,
+            defaults={User.username: msg.from_user.username},
+        )
 
     @staticmethod
     async def get_or_create_user_from_msg(msg: Message) -> User:

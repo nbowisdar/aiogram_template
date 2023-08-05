@@ -1,7 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+/.venv
+
+# Development and debugging files
+.vscode/
+.idea/
+*.vscode/
+*.pydevproject
+*.pytproject
+
+# Logs and other generated files
+*.log
+*.db
+*.sqlite3
+
+# Environment-specific files
+.env
+
+#Custom
 venv
 .idea
 .env
-__pycache__
 test.py
 db.sqlite3
 app.db
@@ -21,3 +55,7 @@ alembic/
 test.py
 logs.log
 app.log
+src.db/
+piccolo_conf.py
+piccolo_conf_test.py
+tests

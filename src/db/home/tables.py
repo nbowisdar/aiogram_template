@@ -6,7 +6,7 @@ from piccolo.table import Table
 
 class User(Table, tablename="users"):
     chat_id = BigInt(unique=True)
-    username = Varchar(null=True)
+    username = Varchar()
     balance = Float(default=0.0)
     ban = Integer(default=0)
     reg_date = Timestamp(default=datetime.now)

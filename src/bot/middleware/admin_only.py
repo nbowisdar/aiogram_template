@@ -12,6 +12,5 @@ class AdminOnly(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         data["new_value"] = "hello world"
-        print(1)
         if event.from_user.id in admins_id:
             return await handler(event, data)

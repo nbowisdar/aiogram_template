@@ -1,7 +1,8 @@
 import asyncio
 
 from aiogram.types import Message
-from tables import User
+
+from .tables import User
 
 
 class CRUD_User:
@@ -30,8 +31,6 @@ crud_user = CRUD_User()
 
 async def test():
     user = await crud_user.get_user_by_chat_id(123)
-    print(user)
-    print(1123)
 
 
 if __name__ == "__main__":
