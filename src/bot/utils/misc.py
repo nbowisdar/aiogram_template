@@ -1,9 +1,6 @@
-import aiohttp
-
 from src.bot.setup import bot
 from src.config import admins_id
 from src.logger import logger
-from src.data import models
 
 
 def get_status_symbol(b: bool) -> str:
@@ -13,7 +10,6 @@ def get_status_symbol(b: bool) -> str:
 
 
 url = "https://www.google.com/"
-
 
 
 async def send_warning(msg: str, user_id: int, send_to_admin=True):

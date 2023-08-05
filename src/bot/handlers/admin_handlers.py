@@ -3,12 +3,8 @@ import aiogram.types as t
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-
 from src.bot.buttons import admin_btns as kb
-from src.bot.db import crud
 from src.bot.setup import admin_router
-
-# from src.bot import msgs, utils
 
 
 @admin_router.message(F.text.in_(["🛑 Скасувати", "↩️ Назад"]))

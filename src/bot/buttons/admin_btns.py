@@ -1,5 +1,4 @@
 import aiogram.types as t
-from src.bot import misc
 from . import base
 
 cancel_kb = t.ReplyKeyboardMarkup(
