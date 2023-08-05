@@ -1,5 +1,4 @@
 import asyncio
-from src.db import piccolo_conf
 
 from src.bot.handlers.admin_handlers import admin_router
 from src.bot.handlers.user_handlers import user_router

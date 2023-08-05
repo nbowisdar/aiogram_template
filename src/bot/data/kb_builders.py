@@ -1,8 +1,11 @@
 from pprint import pprint
-from aiogram.filters.callback_data import CallbackData
 
 import aiogram.types as t
+
+# from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
+
+from src.bot.data.schema import Text_Data
 
 drop_msg = t.InlineKeyboardButton(text="↙️ Приховати", callback_data="hide")
 
@@ -12,12 +15,13 @@ def build_reply_buttons(buttons_text: list[str], adjast=4) -> t.ReplyKeyboardMar
     builder = ReplyKeyboardBuilder()
     builder.add(*buttons)
     builder.adjust(adjast)
-    return builder.as_markup()
+
+    return builder.as_markup(resize_keyboard=True)
 
 
-def get_keyboard_fab(data: list[tuple], adjast=4) -> t.InlineKeyboardMarkup:
+def build_keyboard_fab(data: list[Text_Data], adjast=4) -> t.InlineKeyboardMarkup:
     builder = t.InlineKeyboardBuilder()
-    for text, callback_data in data:
-        builder.add(t.InlineKeyboardButton(text=text, callback_data=callback_data))
-    builder.adjust(4)
+    for d in data:
+        builder.button(text=d.text, callback_data=d.callback_data)
+    builder.adjust(adjast)
     return builder.as_markup()
