@@ -16,34 +16,20 @@ async def _start():
 
 
 def start_simple():
-    logger.debug("Starting bot")
     asyncio.run(_start())
 
 
-# async def on_startup(bot: Bot, base_url: str):
-#     await bot.set_webhook(f"{base_url}")
-
-
-# async def on_shutdown(bot: Bot, base_url: str):
-#     await bot.delete_webhook()
-
-
-# def start_webhook():
-#     # dp["base_url"] = ngrok_url
-#     dp.startup.register(on_startup)
-#     dp.shutdown.register(on_shutdown)
-#     dp.include_router(admin_router)
-
-#     app = web.Application()
-#     app["bot"] = bot
-#     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path="")
-#     setup_application(app, dp, bot=bot)
-#     web.run_app(app, host="0.0.0.0", port=5000)
+def main():
+    # args = parser.parse_args()
+    try:
+        # if args.admin:
+        #     logger.debug("Bot started with admin pannel")
+        #     execute_in_background(start_admin)
+        logger.debug("Bot started")
+        start_simple()
+    except KeyboardInterrupt:
+        logger.info("Bot stopped by admin")
 
 
 if __name__ == "__main__":
-    try:
-        start_simple()  # run without webhook
-        # start_webhook()  # run tg bot
-    except KeyboardInterrupt:
-        logger.info("Bot stopped by admin")
+    main()

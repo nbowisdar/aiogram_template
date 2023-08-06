@@ -10,7 +10,6 @@ from starlette.staticfiles import StaticFiles
 
 from home.endpoints import HomeEndpoint
 from home.piccolo_app import APP_CONFIG
-from home.tables import Task
 
 
 app = FastAPI(
@@ -26,12 +25,6 @@ app = FastAPI(
         ),
         Mount("/static/", StaticFiles(directory="static")),
     ],
-)
-
-
-TaskModelIn: t.Any = create_pydantic_model(table=Task, model_name="TaskModelIn")
-TaskModelOut: t.Any = create_pydantic_model(
-    table=Task, include_default_columns=True, model_name="TaskModelOut"
 )
 
 

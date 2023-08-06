@@ -35,6 +35,8 @@ class Order(Table):
     amount_receive = Float()
 
 
+tables = [User, Order]
+
 # class P2P_User(Table, tablename="p2p_users"):
 #     chat_id = BigInt()
 #     name = Varchar(null=True)
