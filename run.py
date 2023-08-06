@@ -20,11 +20,7 @@ def start_simple():
 
 
 def main():
-    # args = parser.parse_args()
     try:
-        # if args.admin:
-        #     logger.debug("Bot started with admin pannel")
-        #     execute_in_background(start_admin)
         logger.debug("Bot started")
         start_simple()
     except KeyboardInterrupt:

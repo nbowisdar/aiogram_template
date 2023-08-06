@@ -11,7 +11,7 @@ from src.bot.data.schema import (
 )
 
 from .kb_builders import (
-    build_keyboard_fab,
+    build_inline_kb,
     build_reply_buttons,
     build_reply_buttons_strict,
 )
@@ -86,7 +86,7 @@ class Answer_Builder_Inline(Answer_Builder_Base):
         btns_text: tuple[str],
         values_list: tuple[dict],
         lang: str,
-        ajust: int = 3,
+        ajust: int = 1,
         args=[],
     ) -> Message_Back:
         # get buttons text on the selected language
@@ -97,7 +97,7 @@ class Answer_Builder_Inline(Answer_Builder_Base):
             callbac_data, btns_text, values_list
         )
         # create keyboard
-        btn = build_keyboard_fab(text_data_list, ajust)
+        btn = build_inline_kb(text_data_list, ajust)
         text = messages[key][lang]
         # set args to text
         if args:
@@ -106,7 +106,9 @@ class Answer_Builder_Inline(Answer_Builder_Base):
 
 
 class Answer:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+    ) -> None:
         self.builder = Answer_Builder()
         self.strict_builder = Answer_Builder_Strict()
         self.inline_builder = Answer_Builder_Inline()
@@ -128,11 +130,14 @@ class Answer:
         btns_text = [["deposit", "withdraw"], ["cancel"]]
         return self.strict_builder.build_answer(key, btns_text, lang, *args)
 
-    def trade_menu_inline(self, lang="en") -> Message_Back:
-        # texts = ["buy", "sell"]
+    def trade_menu_inline(self, user_id: int, lang="en") -> Message_Back:
         key = "trade_menu"
-        texts = "new_trade", "buy_coin"
-        values = {"action": "buy"}, {"action": "sell"}
+        texts = "new_trade", "buy_coin", "my_trades"
+        values = (
+            {"action": "new_trade", "user_id": user_id},
+            {"action": "buy_coin", "user_id": user_id},
+            {"action": "my_trades", "user_id": user_id},
+        )
 
         msg_back = self.inline_builder.build_answer(
             schema.Trade_Menu_CallbackData, key, texts, values, lang

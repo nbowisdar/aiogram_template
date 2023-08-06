@@ -25,3 +25,6 @@ class Cache:
             logger.debug(f"[User] {user.username}: found in cache")
             return user
         return await self._create_and_save_user(msg)
+
+    async def get_user_by_id(self, user_id: int) -> User:
+        return self.users.get(user_id)

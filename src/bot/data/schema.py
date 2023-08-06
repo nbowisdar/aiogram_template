@@ -7,6 +7,7 @@ from aiogram.filters.callback_data import CallbackData
 
 
 class Trade_Menu_CallbackData(CallbackData, prefix="trade_menu"):
+    user_id: int
     action: str
 
 

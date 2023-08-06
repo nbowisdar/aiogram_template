@@ -3,8 +3,11 @@ from aiogram import F, filters
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
+from src.bot.data import schema
+
 # from src.bot.data import answers
 from src.bot.data.answers import Answer, buttons, messages
+from src.bot.data.language import build_message_with_values
 from src.bot.setup import user_router
 from src.bot.utils.cache import Cache
 from src.db.home.crud import CRUD_User
@@ -20,10 +23,10 @@ async def cancel_handler(message: t.Message, state: FSMContext) -> None:
     current_state = await state.get_state()
     user = await cache.get_user(message)
     if current_state is None:
-        info = answer.user_main_menu(user.lang)
+        info = answer.user_main_menu(lang=user.lang)
     else:
         await state.clear()
-        info = answer.user_main_menu(canceled=True)
+        info = answer.user_main_menu(lang=user.lang, canceled=True)
 
     await message.answer(info.text, reply_markup=info.kb)
 
@@ -45,8 +48,64 @@ async def balance(message: t.Message):
 @user_router.message(F.text.in_(buttons["trade"].values()))
 async def trade_menu(message: t.Message):
     user = await cache.get_user(message)
-    info = answer.trade_menu_inline(user.lang)
+    info = answer.trade_menu_inline(message.from_user.id, user.lang)
     await message.answer(info.text, reply_markup=info.kb)
+
+
+@user_router.callback_query(schema.Trade_Menu_CallbackData.filter())
+async def handle_trade_menu(
+    callback: t.CallbackQuery,
+    callback_data: schema.Trade_Menu_CallbackData,
+    state: FSMContext,
+):
+    msg = callback.message
+    user = await cache.get_user_by_id(callback_data.user_id)
+
+    match callback_data.action:
+        case "new_trade":
+            msg = build_message_with_values("set_amount", user.lang, [user.balance])
+            info = answer.user_cancel()
+            await state.set_state(NewOrderState.amount)
+            await state.update_data(lang=user.lang)
+        case "buy_coin":
+            msg = "buy_coin"
+        case "my_trades":
+            msg = "my_trades"
+
+    await callback.message.delete()
+    await callback.message.answer(msg, reply_markup=info.kb)
+
+
+"""Creating new order"""
+
+
+class NewOrderState(StatesGroup):
+    lang = State()
+    amount = State()
+    percent = State()
+    number = State()
+    confirm = State()
+
+
+@user_router.message(NewOrderState.amount)
+async def set_amount(message: t.Message, state: FSMContext):
+    try:
+        amount = float(message.text)
+        await state.update_data(amount=amount)
+    except TypeError:
+        await message.answer("error")
+        await state.clear()
+        return
+    await state.set_state(NewOrderState.percent)
+
+    data = await state.get_data()
+    lang = data["lang"]
+    await message.answer(messages["set_percentage"][lang])
+
+
+@user_router.message(NewOrderState.percent)
+async def set_percent(message: t.Message, state: FSMContext):
+    print("set_percent...")
 
 
 @user_router.message(F.text == "test")
