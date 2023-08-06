@@ -1,4 +1,5 @@
 import aiogram.types as t
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
@@ -28,8 +29,8 @@ def build_reply_buttons_strict(buttons_text: list[str]) -> t.ReplyKeyboardMarkup
     )
 
 
-def build_keyboard_fab(data: list[Text_Data], adjast=4) -> t.InlineKeyboardMarkup:
-    builder = t.InlineKeyboardBuilder()
+def build_keyboard_fab(data: list[Text_Data], adjast=1) -> t.InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
     for d in data:
         builder.button(text=d.text, callback_data=d.callback_data)
     builder.adjust(adjast)

@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 # from src.bot.data import answers
-from src.bot.data.answers import buttons, messages, Answer
+from src.bot.data.answers import Answer, buttons, messages
 from src.bot.setup import user_router
 from src.bot.utils.cache import Cache
 from src.db.home.crud import CRUD_User
@@ -39,6 +39,13 @@ async def main(message: t.Message):
 async def balance(message: t.Message):
     user = await cache.get_user(message)
     info = answer.balance(user.lang, str(user.balance))
+    await message.answer(info.text, reply_markup=info.kb)
+
+
+@user_router.message(F.text.in_(buttons["trade"].values()))
+async def trade_menu(message: t.Message):
+    user = await cache.get_user(message)
+    info = answer.trade_menu_inline(user.lang)
     await message.answer(info.text, reply_markup=info.kb)
 
 
