@@ -38,6 +38,7 @@ class Answer_Builder_Base:
 class Answer_Builder(Answer_Builder_Base):
     @staticmethod
     def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
+        print(btns_text)
         return [buttons[text][lang] for text in btns_text]
 
     @classmethod
@@ -108,10 +109,13 @@ class Answer_Builder_Inline(Answer_Builder_Base):
         text = messages[key][lang]
         # set args to text
         if data:
-            # text = self._set_args_to_text(text, args)     ###############
             text = insert_dect_in_text(text, data)
-            print(text)
         return Message_Back(text, btn)
+
+
+"""Buttons"""
+
+main_menu_btn = [["balance", "trade", "statistics"], ["help"]]
 
 
 class Answer:
@@ -122,17 +126,22 @@ class Answer:
         self.strict_builder = Answer_Builder_Strict()
         self.inline_builder = Answer_Builder_Inline()
 
-    def user_main_menu(self, *, lang="en", canceled=False) -> Message_Back:
-        key = "cancel" if canceled else "main_menu"
-
-        btns_text = [["balance", "trade", "statistics"], ["help"]]
-        return self.strict_builder.build_answer(key, btns_text, lang)
-
     def user_cancel(self, lang="en") -> Message_Back:
         key = "cancel"
         btns_text = [key]
 
         return self.builder.build_answer(key, btns_text, lang)
+
+    def confirmed(self, lang="en") -> Message_Back:
+        key = "confirmed"
+        # btns_text = [key]
+
+        return self.strict_builder.build_answer(key, main_menu_btn, lang)
+
+    def user_main_menu(self, *, lang="en", canceled=False) -> Message_Back:
+        key = "cancel" if canceled else "main_menu"
+
+        return self.strict_builder.build_answer(key, main_menu_btn, lang)
 
     def balance(self, lang="en", *args) -> Message_Back:
         key = "balance"
@@ -162,6 +171,6 @@ class Answer:
         )
 
         msg_back = self.inline_builder.build_answer(
-            callback.Trade_Menu, key, texts, values, lang, data=data
+            callback.Confirm_New_Order, key, texts, values, lang, data=data
         )
         return msg_back

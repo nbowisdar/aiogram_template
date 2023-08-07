@@ -1,5 +1,10 @@
 {
 	"messages": {
+		"confirmed": {
+			"en": "✅ Confirmed",
+			"ru": "✅ Подтверждено",
+			"ua": "✅ Підтверджено"
+		},
 		"main_menu": {
 			"en": "Main menu",
 			"ru": "Меню",

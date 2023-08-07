@@ -1,19 +1,20 @@
 from datetime import datetime
 
 from piccolo.columns import (
+    # UUID,
     BigInt,
     Boolean,
     Float,
+    ForeignKey,
     Integer,
     Timestamp,
     Varchar,
-    ForeignKey,
 )
 from piccolo.table import Table
 
 
 class User(Table, tablename="users"):
-    chat_id = BigInt(unique=True)
+    id = BigInt(primary_key=True)
     username = Varchar()
     balance = Float(default=0.0)
     reg_date = Timestamp(default=datetime.now)
@@ -25,14 +26,12 @@ class User(Table, tablename="users"):
 
 
 class Order(Table):
-    # active = IntegerField(default=1)
-    status = Varchar(default="active")
-    seller = ForeignKey(references=User)
-    buyer = ForeignKey(references=User)
-    date = Timestamp(default=datetime.now)
-    status = Varchar(default="active")
     amount_sell = Float()
-    amount_receive = Float()
+    percent = Float()
+    buyer = ForeignKey(references=User)
+    seller = ForeignKey(references=User)
+    status = Varchar(default="active")
+    date = Timestamp(default=datetime.now)
 
 
 tables = [User, Order]

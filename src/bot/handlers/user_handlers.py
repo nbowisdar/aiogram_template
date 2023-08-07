@@ -15,10 +15,11 @@ from src.bot.setup import user_router
 from src.bot.utils import validation
 from src.bot.utils.cache import Cache
 from src.bot.utils.shortcuts import get_lang_from_state
-from src.db.home.crud import CRUD_User
+from src.db.home.crud import CRUD_Order, CRUD_User
 from src.db.home.tables import User
 
 crud_user = CRUD_User()
+crud_order = CRUD_Order()
 cache = Cache()
 answer = Answer()
 
@@ -135,11 +136,28 @@ async def set_number(message: t.Message, state: FSMContext):
     await message.answer(info.text, reply_markup=info.kb)
 
 
-@user_router.message(NewOrderState.confirm)
-async def confirm_order(message: t.Message, state: FSMContext):
-    print("Confirm order")
-    # lang = await get_lang_from_state(state)
-    # await message.answer(messages["confirm_new_order"][lang])
+# @user_router.message(NewOrderState.confirm)
+@user_router.callback_query(callback.Confirm_New_Order.filter())
+async def confirm_order(
+    callback: t.CallbackQuery,
+    callback_data: callback.Confirm_New_Order,
+    state: FSMContext,
+):
+    await callback.message.delete()
+    lang = await get_lang_from_state(state)
+    if callback_data.action == "confirm":
+        data = await state.get_data()
+        await crud_order.create_order(
+            data["amount"], data["percent"], callback_data.user_id
+        )
+
+        info = answer.confirmed(lang)
+
+        await callback.message.answer(info.text, reply_markup=info.kb)
+        await state.clear()
+    else:
+        info = answer.user_main_menu(lang=lang, canceled=True)
+        await callback.message.answer(info.text, reply_markup=info.kb)
 
 
 @user_router.message(F.text == "test")
