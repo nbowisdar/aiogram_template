@@ -3,7 +3,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from src.bot.data import callback, schema
-from src.bot.data.language import insert_dect_in_text, translations
+from src.bot.data.language import formator, translations
 from src.bot.data.schema import (
     Inline_Builder,
     Message_Back,
@@ -86,6 +86,25 @@ class Answer_Builder_Inline(Answer_Builder_Base):
             resp.append(buttons[key][lang])
         return resp
 
+    def build_kb(
+        self,
+        *,
+        callbac_data: CallbackData,
+        btns_text: tuple[str],
+        values_list: tuple[dict],
+        lang: str,
+        ajust: int = 1,
+    ) -> t.InlineKeyboardMarkup | t.ReplyKeyboardMarkup:
+        # get buttons text on the selected language
+        btns_text = self._set_buttons_text(btns_text, lang)
+
+        # create list of callback data and text
+        text_data_list = self.inner_builder.build_inline_kb_bulk(
+            callbac_data, btns_text, values_list
+        )
+        # create keyboard
+        return build_inline_kb(text_data_list, ajust)
+
     def build_answer(
         self,
         callbac_data: CallbackData,
@@ -96,26 +115,40 @@ class Answer_Builder_Inline(Answer_Builder_Base):
         ajust: int = 1,
         data={},
     ) -> Message_Back:
-        # get buttons text on the selected language
-        btns_text = self._set_buttons_text(btns_text, lang)  ######
-        # btns_text = self._set_buttons_text_strict(btns_text, lang)  ######
-
-        # create list of callback data and text
-        text_data_list = self.inner_builder.build_inline_kb_bulk(
-            callbac_data, btns_text, values_list
+        btn = self.build_kb(
+            callbac_data=callbac_data,
+            btns_text=btns_text,
+            values_list=values_list,
+            lang=lang,
+            ajust=ajust,
         )
-        # create keyboard
-        btn = build_inline_kb(text_data_list, ajust)
+
         text = messages[key][lang]
         # set args to text
         if data:
-            text = insert_dect_in_text(text, data)
+            text = formator(text, data)
         return Message_Back(text, btn)
+
+        # # get buttons text on the selected language
+        # btns_text = self._set_buttons_text(btns_text, lang)  ######
+        # # btns_text = self._set_buttons_text_strict(btns_text, lang)  ######
+
+        # # create list of callback data and text
+        # text_data_list = self.inner_builder.build_inline_kb_bulk(
+        #     callbac_data, btns_text, values_list
+        # )
+        # # create keyboard
+        # btn = build_inline_kb(text_data_list, ajust)
+
+        # Need to sepparate that
 
 
 """Buttons"""
-
 main_menu_btn = [["balance", "trade", "statistics"], ["help"]]
+
+"""Inline Buttons"""
+confirm_cancel_btn = "confirm", "cancel"
+cancel_hide_btn = "hide", "cancel"
 
 
 class Answer:
@@ -127,7 +160,7 @@ class Answer:
         self.inline_builder = Answer_Builder_Inline()
 
     def user_cancel(self, lang="en") -> Message_Back:
-        key = "cancel"
+        key = "canceled"
         btns_text = [key]
 
         return self.builder.build_answer(key, btns_text, lang)
@@ -157,10 +190,9 @@ class Answer:
             {"action": "my_trades", "user_id": user_id},
         )
 
-        msg_back = self.inline_builder.build_answer(
+        return self.inline_builder.build_answer(
             callback.Trade_Menu, key, texts, values, lang
         )
-        return msg_back
 
     def confirm_new_order(self, user_id: int, data: dict, lang="en") -> Message_Back:
         key = "confirm_new_order"
@@ -170,7 +202,24 @@ class Answer:
             {"action": "cancel", "user_id": user_id},
         )
 
-        msg_back = self.inline_builder.build_answer(
+        return self.inline_builder.build_answer(
             callback.Confirm_New_Order, key, texts, values, lang, data=data
         )
-        return msg_back
+
+    def cancel_or_hide_active_order(
+        self, user_id: int, order_id: int, lang="en"
+    ) -> t.InlineKeyboardMarkup:
+        ajust = 2
+
+        values = (
+            {"action": "hide", "order_id": order_id, "user_id": user_id},
+            {"action": "cancel", "order_id": order_id, "user_id": user_id},
+        )
+
+        return self.inline_builder.build_kb(
+            callbac_data=callback.Cancel_Active_Order,
+            btns_text=cancel_hide_btn,
+            values_list=values,
+            lang=lang,
+            ajust=ajust,
+        )

@@ -3,20 +3,19 @@ from aiogram import F, filters
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from src.bot.data import callback, schema
+from src.bot.data import callback
 
 # from src.bot.data import answers
 from src.bot.data.answers import Answer, buttons, messages
 from src.bot.data.language import (
     build_message_with_values,
-    build_msg_with_values_from_dict,
 )
 from src.bot.setup import user_router
+from src.bot.utils import shortcuts as short
 from src.bot.utils import validation
 from src.bot.utils.cache import Cache
-from src.bot.utils.shortcuts import get_lang_from_state
 from src.db.home.crud import CRUD_Order, CRUD_User
-from src.db.home.tables import User
+from src.logger import logger
 
 crud_user = CRUD_User()
 crud_order = CRUD_Order()
@@ -66,6 +65,7 @@ async def handle_trade_menu(
 ):
     msg = callback.message
     user = await cache.get_user_by_id(callback_data.user_id)
+    await callback.message.delete()
 
     match callback_data.action:
         case "new_trade":
@@ -73,13 +73,12 @@ async def handle_trade_menu(
             info = answer.user_cancel()
             await state.set_state(NewOrderState.amount)
             await state.update_data(lang=user.lang)
+            await callback.message.answer(msg, reply_markup=info.kb)
         case "buy_coin":
             msg = "buy_coin"
         case "my_trades":
             msg = "my_trades"
-
-    await callback.message.delete()
-    await callback.message.answer(msg, reply_markup=info.kb)
+            await short.send_users_active_trades(user.id, user.lang)
 
 
 """Creating new order"""
@@ -102,7 +101,7 @@ async def set_amount(message: t.Message, state: FSMContext):
 
     await state.update_data(amount=amount)
     await state.set_state(NewOrderState.percent)
-    lang = await get_lang_from_state(state)
+    lang = await short.get_lang_from_state(state)
     await message.answer(messages["set_percentage"][lang])
 
 
@@ -115,7 +114,7 @@ async def set_percent(message: t.Message, state: FSMContext):
 
     await state.update_data(percent=percent)
     await state.set_state(NewOrderState.number)
-    lang = await get_lang_from_state(state)
+    lang = await short.get_lang_from_state(state)
     await message.answer(messages["set_number"][lang])
 
 
@@ -129,7 +128,7 @@ async def set_number(message: t.Message, state: FSMContext):
     await state.update_data(number=number)
     await state.set_state(NewOrderState.confirm)
 
-    lang = await get_lang_from_state(state)
+    lang = await short.get_lang_from_state(state)
     data = await state.get_data()
     info = answer.confirm_new_order(message.from_user.id, data, lang)
 
@@ -144,7 +143,7 @@ async def confirm_order(
     state: FSMContext,
 ):
     await callback.message.delete()
-    lang = await get_lang_from_state(state)
+    lang = await short.get_lang_from_state(state)
     if callback_data.action == "confirm":
         data = await state.get_data()
         await crud_order.create_order(
@@ -158,6 +157,21 @@ async def confirm_order(
     else:
         info = answer.user_main_menu(lang=lang, canceled=True)
         await callback.message.answer(info.text, reply_markup=info.kb)
+
+
+@user_router.callback_query(callback.Cancel_Active_Order.filter())
+async def cancel_hide_order(
+    callback: t.CallbackQuery, callback_data: callback.Confirm_New_Order
+):
+    user = await cache.get_user_by_id(callback_data.user_id)
+    if callback_data.action == "cancel":
+        await crud_order.delete_order(callback_data.order_id)
+        await callback.message.edit_text(messages["canceled"][user.lang])
+        logger.debug(
+            "[User] {} canceled order {}".format(user.username, callback_data.order_id)
+        )
+    else:
+        await callback.message.delete()
 
 
 @user_router.message(F.text == "test")

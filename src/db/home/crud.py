@@ -44,6 +44,9 @@ class CRUD_Order:
     async def delete_order(id: int):
         await Order.delete().where(Order.id == id)
 
+    def get_users_orders(self, user_id: int) -> list[dict]:
+        return Order.select().where(Order.seller == user_id)
+
 
 # crud_user = CRUD_User()
 

@@ -17,7 +17,7 @@ def build_message_with_values(key: str, lang: str, values: Iterable) -> str:
     return msg
 
 
-def insert_dect_in_text(text: str, d: dict) -> str:
+def formator(text: str, d: dict) -> str:
     for k, v in d.items():
         text = text.replace(f"${k}", str(v))
     return text
@@ -25,4 +25,4 @@ def insert_dect_in_text(text: str, d: dict) -> str:
 
 def build_msg_with_values_from_dict(key: str, lang: str, d: dict) -> str:
     msg: str = messages[key][lang]
-    return insert_dect_in_text(msg, d)
+    return formator(msg, d)

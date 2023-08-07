@@ -31,7 +31,7 @@ class Order(Table):
     buyer = ForeignKey(references=User)
     seller = ForeignKey(references=User)
     status = Varchar(default="active")
-    date = Timestamp(default=datetime.now)
+    created_at = Timestamp(default=datetime.now)
 
 
 tables = [User, Order]
