@@ -2,8 +2,8 @@ import aiogram.types as t
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.data import schema
-from src.bot.data.language import translations
+from src.bot.data import callback, schema
+from src.bot.data.language import insert_dect_in_text, translations
 from src.bot.data.schema import (
     Inline_Builder,
     Message_Back,
@@ -18,7 +18,7 @@ from .kb_builders import (
 
 messages = translations["messages"]
 buttons = translations["buttons"]
-callback_buttons = translations["inline_buttons"]
+# callback_buttons = translations["inline_buttons"]
 
 
 class Answer_Builder_Base:
@@ -27,6 +27,12 @@ class Answer_Builder_Base:
         for _, d in enumerate(data):
             text = text.replace("{}", d, 1)
         return text
+
+    # @staticmethod
+    # def _set_args_to_text(text: str, data: list[str]) -> str:
+    #     for _, d in enumerate(data):
+    #         text = text.replace("{}", d, 1)
+    #     return text
 
 
 class Answer_Builder(Answer_Builder_Base):
@@ -76,7 +82,7 @@ class Answer_Builder_Inline(Answer_Builder_Base):
     def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
         resp = []
         for key in btns_text:
-            resp.append(callback_buttons[key][lang])
+            resp.append(buttons[key][lang])
         return resp
 
     def build_answer(
@@ -87,10 +93,11 @@ class Answer_Builder_Inline(Answer_Builder_Base):
         values_list: tuple[dict],
         lang: str,
         ajust: int = 1,
-        args=[],
+        data={},
     ) -> Message_Back:
         # get buttons text on the selected language
-        btns_text = self._set_buttons_text(btns_text, lang)
+        btns_text = self._set_buttons_text(btns_text, lang)  ######
+        # btns_text = self._set_buttons_text_strict(btns_text, lang)  ######
 
         # create list of callback data and text
         text_data_list = self.inner_builder.build_inline_kb_bulk(
@@ -100,8 +107,10 @@ class Answer_Builder_Inline(Answer_Builder_Base):
         btn = build_inline_kb(text_data_list, ajust)
         text = messages[key][lang]
         # set args to text
-        if args:
-            text = self._set_args_to_text(text, args)
+        if data:
+            # text = self._set_args_to_text(text, args)     ###############
+            text = insert_dect_in_text(text, data)
+            print(text)
         return Message_Back(text, btn)
 
 
@@ -140,6 +149,19 @@ class Answer:
         )
 
         msg_back = self.inline_builder.build_answer(
-            schema.Trade_Menu_CallbackData, key, texts, values, lang
+            callback.Trade_Menu, key, texts, values, lang
+        )
+        return msg_back
+
+    def confirm_new_order(self, user_id: int, data: dict, lang="en") -> Message_Back:
+        key = "confirm_new_order"
+        texts = "confirm", "cancel"
+        values = (
+            {"action": "confirm", "user_id": user_id},
+            {"action": "cancel", "user_id": user_id},
+        )
+
+        msg_back = self.inline_builder.build_answer(
+            callback.Trade_Menu, key, texts, values, lang, data=data
         )
         return msg_back

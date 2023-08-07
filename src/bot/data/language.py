@@ -17,8 +17,13 @@ def build_message_with_values(key: str, lang: str, values: Iterable) -> str:
     return msg
 
 
+def insert_dect_in_text(text: str, d: dict) -> str:
+    print(d)
+    for k, v in d.items():
+        text = text.replace(f"${k}", str(v))
+    return text
+
+
 def build_msg_with_values_from_dict(key: str, lang: str, d: dict) -> str:
     msg: str = messages[key][lang]
-    for k, v in d.items():
-        msg = msg.replace(f"${k}", str(v))
-    return msg
+    return insert_dect_in_text(msg, d)

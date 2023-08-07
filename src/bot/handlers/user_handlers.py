@@ -3,7 +3,7 @@ from aiogram import F, filters
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from src.bot.data import schema
+from src.bot.data import callback, schema
 
 # from src.bot.data import answers
 from src.bot.data.answers import Answer, buttons, messages
@@ -57,10 +57,10 @@ async def trade_menu(message: t.Message):
     await message.answer(info.text, reply_markup=info.kb)
 
 
-@user_router.callback_query(schema.Trade_Menu_CallbackData.filter())
+@user_router.callback_query(callback.Trade_Menu.filter())
 async def handle_trade_menu(
     callback: t.CallbackQuery,
-    callback_data: schema.Trade_Menu_CallbackData,
+    callback_data: callback.Trade_Menu,
     state: FSMContext,
 ):
     msg = callback.message
@@ -127,13 +127,12 @@ async def set_number(message: t.Message, state: FSMContext):
 
     await state.update_data(number=number)
     await state.set_state(NewOrderState.confirm)
+
     lang = await get_lang_from_state(state)
-
     data = await state.get_data()
-    print(data)
-    msg = build_msg_with_values_from_dict("confirm_new_order", lang, data)
+    info = answer.confirm_new_order(message.from_user.id, data, lang)
 
-    await message.answer(msg)
+    await message.answer(info.text, reply_markup=info.kb)
 
 
 @user_router.message(NewOrderState.confirm)

@@ -3,12 +3,7 @@ from typing import NamedTuple
 from aiogram import types
 from aiogram.filters.callback_data import CallbackData
 
-"""Call Back data"""
 
-
-class Trade_Menu_CallbackData(CallbackData, prefix="trade_menu"):
-    user_id: int
-    action: str
 
 
 """Other schema"""
