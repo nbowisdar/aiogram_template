@@ -7,9 +7,14 @@ from src.bot.data import schema
 
 # from src.bot.data import answers
 from src.bot.data.answers import Answer, buttons, messages
-from src.bot.data.language import build_message_with_values
+from src.bot.data.language import (
+    build_message_with_values,
+    build_msg_with_values_from_dict,
+)
 from src.bot.setup import user_router
+from src.bot.utils import validation
 from src.bot.utils.cache import Cache
+from src.bot.utils.shortcuts import get_lang_from_state
 from src.db.home.crud import CRUD_User
 from src.db.home.tables import User
 
@@ -89,25 +94,55 @@ class NewOrderState(StatesGroup):
 
 @user_router.message(NewOrderState.amount)
 async def set_amount(message: t.Message, state: FSMContext):
-    try:
-        amount = float(message.text)
-        await state.update_data(amount=amount)
-    except TypeError:
+    amount = validation.simple_check_digit(message.text, float)
+    if not amount:
         await message.answer("error")
-        await state.clear()
-        return
-    await state.set_state(NewOrderState.percent)
+        return await state.clear()
 
-    data = await state.get_data()
-    lang = data["lang"]
+    await state.update_data(amount=amount)
+    await state.set_state(NewOrderState.percent)
+    lang = await get_lang_from_state(state)
     await message.answer(messages["set_percentage"][lang])
 
 
 @user_router.message(NewOrderState.percent)
 async def set_percent(message: t.Message, state: FSMContext):
-    print("set_percent...")
+    percent = validation.simple_check_digit(message.text, int)
+    if not percent:
+        await message.answer("error")
+        return await state.clear()
+
+    await state.update_data(percent=percent)
+    await state.set_state(NewOrderState.number)
+    lang = await get_lang_from_state(state)
+    await message.answer(messages["set_number"][lang])
+
+
+@user_router.message(NewOrderState.number)
+async def set_number(message: t.Message, state: FSMContext):
+    number = validation.check_mobile_number(message.text)
+    if not number:
+        await message.answer("error")
+        return await state.clear()
+
+    await state.update_data(number=number)
+    await state.set_state(NewOrderState.confirm)
+    lang = await get_lang_from_state(state)
+
+    data = await state.get_data()
+    print(data)
+    msg = build_msg_with_values_from_dict("confirm_new_order", lang, data)
+
+    await message.answer(msg)
+
+
+@user_router.message(NewOrderState.confirm)
+async def confirm_order(message: t.Message, state: FSMContext):
+    print("Confirm order")
+    # lang = await get_lang_from_state(state)
+    # await message.answer(messages["confirm_new_order"][lang])
 
 
 @user_router.message(F.text == "test")
 async def test(message: t.Message):
-    await message.answer("bot works")
+    await message.answer("`bot`works")

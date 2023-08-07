@@ -15,3 +15,10 @@ def build_message_with_values(key: str, lang: str, values: Iterable) -> str:
     for v in values:
         msg = msg.replace("{}", v, 1)
     return msg
+
+
+def build_msg_with_values_from_dict(key: str, lang: str, d: dict) -> str:
+    msg: str = messages[key][lang]
+    for k, v in d.items():
+        msg = msg.replace(f"${k}", str(v))
+    return msg

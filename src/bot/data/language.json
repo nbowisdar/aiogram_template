@@ -31,19 +31,14 @@
 			"ua": "Будь ласка, введіть відсоток збільшення від 1 до 15%"
 		},
 		"set_number": {
-			"en": "Please, enter your number in format +1XXXXXXXXX",
+			"en": "Please, enter your number in format +1XXXXXXXXX\n\nExample: `+1123456789`",
 			"ru": "Пожалуйста, введите ваш номер в формате +1XXXXXXXXX",
 			"ua": "Будь ласка, введіть ваш номер в форматі +1XXXXXXXXX"
 		},
-		"ocnfirm_new_order": {
-			"en": "You entered:\nAmount: {}\nPercent: {}\nNumber: {}\n\nConfirm?",
-			"ru": "Вы ввели:\nКоличество: {}\nПроцент: {}\nНомер: {}\n\nПодтвердить?",
-			"ua": "Ви ввели:\nКількість: {}\nПроцент: {}\nНомер: {}\n\nПідтвердити?"
-		},
-		"trade_confirmed": {
-			"en": "Trade confirmed",
-			"ru": "Торговля подтверждена",
-			"ua": "Торгування подтверджено"
+		"confirm_new_order": {
+			"en": "You entered:\nAmount: $amount\nPercent: $percent\nNumber: $number\n\nConfirm?",
+			"ru": "Вы ввели:\nКоличество: $amount\nПроцент: $percent\nНомер: $number\n\nПодтвердить?",
+			"ua": "Ви ввели:\nКількість: $amount\nПроцент: $percent\nНомер: $number\n\nПідтвердити?"
 		},
 		"cancelled": {
 			"en": "Cancelled",

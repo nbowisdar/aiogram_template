@@ -1,3 +1,5 @@
+from aiogram import types as t
+from aiogram.fsm.context import FSMContext
 from src.bot.setup import bot
 from src.config import admins_id
 from src.logger import logger
