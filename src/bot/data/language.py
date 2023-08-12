@@ -17,12 +17,14 @@ def build_message_with_values(key: str, lang: str, values: Iterable) -> str:
     return msg
 
 
-def formator(text: str, d: dict) -> str:
+def inject_args(text: str, d: dict) -> str:
     for k, v in d.items():
         text = text.replace(f"${k}", str(v))
     return text
 
 
-def build_msg_with_values_from_dict(key: str, lang: str, d: dict) -> str:
+def build_message(key: str, lang: str, injection_data: dict | None = None) -> str:
     msg: str = messages[key][lang]
-    return formator(msg, d)
+    if injection_data:
+        return inject_args(msg, injection_data)
+    return msg

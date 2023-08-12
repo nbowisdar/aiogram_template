@@ -18,7 +18,7 @@ def build_reply_buttons(buttons_text: list[str], adjast: int) -> t.ReplyKeyboard
     return builder.as_markup(resize_keyboard=True)
 
 
-def build_reply_buttons_strict(buttons_text: list[str]) -> t.ReplyKeyboardMarkup:
+def build_reply_buttons_strict(buttons_text: list[list[str]]) -> t.ReplyKeyboardMarkup:
     kb = [
         list(map(lambda btns_raw: t.KeyboardButton(text=btns_raw), btns_raw))
         for btns_raw in buttons_text
@@ -29,13 +29,12 @@ def build_reply_buttons_strict(buttons_text: list[str]) -> t.ReplyKeyboardMarkup
     )
 
 
-def build_inline_kb(data: list[Text_Data], adjast=1) -> t.InlineKeyboardMarkup:
+def build_inline_kb(data: list[Text_Data], adjust=1) -> t.InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for d in data:
         builder.button(text=d.text, callback_data=d.callback_data)
-    builder.adjust(adjast)
+    builder.adjust(adjust)
     return builder.as_markup()
-
 
 # def build_inline_kb_strict(data: list[Text_Data]) -> t.InlineKeyboardMarkup:
 #     builder = InlineKeyboardBuilder()

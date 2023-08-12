@@ -55,7 +55,5 @@ alembic/
 test.py
 logs.log
 app.log
-src.db/
-piccolo_conf.py
-piccolo_conf_test.py
-tests
+src/db/home/piccolo_migrations
+playground.py

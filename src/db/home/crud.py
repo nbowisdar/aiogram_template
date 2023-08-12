@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram.types import Message
 
 from .tables import Order, User

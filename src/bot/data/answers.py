@@ -1,14 +1,9 @@
-import aiogram.types as t
-from aiogram.filters.callback_data import CallbackData
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from typing import Iterable, TypeVar
 
-from src.bot.data import callback, schema
-from src.bot.data.language import formator, translations
-from src.bot.data.schema import (
-    Inline_Builder,
-    Message_Back,
-    Text_Data,
-)
+import aiogram.types as t
+
+from src.bot.data.language import translations, build_message
+from src.bot.data import schema
 
 from .kb_builders import (
     build_inline_kb,
@@ -18,208 +13,210 @@ from .kb_builders import (
 
 messages = translations["messages"]
 buttons = translations["buttons"]
+
+
 # callback_buttons = translations["inline_buttons"]
 
 
-class Answer_Builder_Base:
-    @staticmethod
-    def _set_args_to_text(text: str, data: list[str]) -> str:
-        for _, d in enumerate(data):
-            text = text.replace("{}", d, 1)
-        return text
+# class Answer_Builder_Base:
+#     @staticmethod
+#     def _set_args_to_text(text: str, data: list[str]) -> str:
+#         for _, d in enumerate(data):
+#             text = text.replace("{}", d, 1)
+#         return text
 
-    # @staticmethod
-    # def _set_args_to_text(text: str, data: list[str]) -> str:
-    #     for _, d in enumerate(data):
-    #         text = text.replace("{}", d, 1)
-    #     return text
+# @staticmethod
+# def _set_args_to_text(text: str, data: list[str]) -> str:
+#     for _, d in enumerate(data):
+#         text = text.replace("{}", d, 1)
+#     return text
 
 
-class Answer_Builder(Answer_Builder_Base):
+class Markup:
     @staticmethod
     def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
-        print(btns_text)
         return [buttons[text][lang] for text in btns_text]
 
     @classmethod
-    def build_answer(
-        cls, key: str, btns_text: list[str], lang: str, ajust: int = 3, args=[]
-    ) -> Message_Back:
-        btns_text = cls._set_buttons_text(btns_text, lang)
-        # build kb using builder and ajust
-        btn = build_reply_buttons(btns_text, ajust)
-        text = messages[key][lang]
-        if args:
-            text = cls._set_args_to_text(text, args)
-        return Message_Back(text, btn)
+    def buttons(cls, data: schema.Answer_Build_Data) -> t.ReplyKeyboardMarkup:
+        btns_text = cls._set_buttons_text(data.btns_text, data.lang)
+        return build_reply_buttons(btns_text, data.adjust)
 
 
-class Answer_Builder_Strict(Answer_Builder_Base):
+class Markup_Strict:
     @staticmethod
-    def _set_buttons_text(btns_list: list[list[str]], lang: str) -> list[str]:
+    def _set_buttons_text(btns_list: list[list[str]], lang: str) -> list[list[str]]:
         new_list = []
         for btns_row in btns_list:
             new_list.append([buttons[text][lang] for text in btns_row])
         return new_list
 
     @classmethod
-    def build_answer(
-        cls, key: str, btns_text: list[str], lang: str, args=[]
-    ) -> Message_Back:
-        btns_text = cls._set_buttons_text(btns_text, lang)
-        # build kb using builder and ajust
-        btn = build_reply_buttons_strict(btns_text)
-        text = messages[key][lang]
-        if args:
-            text = cls._set_args_to_text(text, args)
-        return Message_Back(text, btn)
+    def buttons(cls, data: schema.Answer_Build_Data) -> t.ReplyKeyboardMarkup:
+        btns_text = cls._set_buttons_text(data.btns_text, data.lang)
+        return build_reply_buttons_strict(btns_text)
 
 
-class Answer_Builder_Inline(Answer_Builder_Base):
-    def __init__(self) -> None:
-        self.inner_builder = Inline_Builder()
+class Markup_Inline:
 
     @staticmethod
-    def _set_buttons_text(btns_text: list[str], lang: str) -> list[str]:
-        resp = []
-        for key in btns_text:
-            resp.append(buttons[key][lang])
-        return resp
+    def _set_buttons_text(btns_text: Iterable[str], lang: str) -> list[str]:
+        return [buttons[key][lang] for key in btns_text]
 
-    def build_kb(
-        self,
-        *,
-        callbac_data: CallbackData,
-        btns_text: tuple[str],
-        values_list: tuple[dict],
-        lang: str,
-        ajust: int = 1,
-    ) -> t.InlineKeyboardMarkup | t.ReplyKeyboardMarkup:
-        # get buttons text on the selected language
-        btns_text = self._set_buttons_text(btns_text, lang)
-
+    @classmethod
+    def buttons(cls, data: schema.Answer_Build_Data_Inline) -> t.InlineKeyboardMarkup:
         # create list of callback data and text
-        text_data_list = self.inner_builder.build_inline_kb_bulk(
-            callbac_data, btns_text, values_list
-        )
+        builder = schema.Text_Data_Builder(data.callback_data)
+
+        # localize text for buttons
+        btns_text = cls._set_buttons_text(data.btns_text, data.lang)
+
+        text_data_list = builder.bulk_build_text_data(btns_text, data.values_list)
         # create keyboard
-        return build_inline_kb(text_data_list, ajust)
+        return build_inline_kb(text_data_list, data.adjust)
 
-    def build_answer(
-        self,
-        callbac_data: CallbackData,
-        key: str,
-        btns_text: tuple[str],
-        values_list: tuple[dict],
-        lang: str,
-        ajust: int = 1,
-        data={},
-    ) -> Message_Back:
-        btn = self.build_kb(
-            callbac_data=callbac_data,
-            btns_text=btns_text,
-            values_list=values_list,
-            lang=lang,
-            ajust=ajust,
-        )
+    # def build_answer(
+    #         self,
+    #         callback_data: CallbackData,
+    #         btns_text: Iterable[str],
+    #         values_list: Iterable[dict],
+    #         adjust: int = 1,
+    #
+    # ) -> MessageDate:
+    #     markup = self.buttons(
+    #         callback_data=callback_data,
+    #         btns_text=btns_text,
+    #         values_list=values_list,
+    #         adjust=adjust,
+    #     )
 
-        text = messages[key][lang]
-        # set args to text
-        if data:
-            text = formator(text, data)
-        return Message_Back(text, btn)
+    # set args to text
+    # if data:
+    #     text = inject_args(text, data)
+    # return MessageDate(text, btn)
 
-        # # get buttons text on the selected language
-        # btns_text = self._set_buttons_text(btns_text, lang)  ######
-        # # btns_text = self._set_buttons_text_strict(btns_text, lang)  ######
+    # # get buttons text on the selected language
 
-        # # create list of callback data and text
-        # text_data_list = self.inner_builder.build_inline_kb_bulk(
-        #     callbac_data, btns_text, values_list
-        # )
-        # # create keyboard
-        # btn = build_inline_kb(text_data_list, ajust)
+    # # create list of callback data and text
+    # text_data_list = self.inner_builder.build_inline_kb_bulk(
+    #     callbac_data, btns_text, values_list
+    # )
+    # # create keyboard
+    # btn = build_inline_kb(text_data_list, adjust)
 
-        # Need to sepparate that
+    # Need to sepparate that
 
 
-"""Buttons"""
-main_menu_btn = [["balance", "trade", "statistics"], ["help"]]
-
-"""Inline Buttons"""
-confirm_cancel_btn = "confirm", "cancel"
-cancel_hide_btn = "hide", "cancel"
+Answer_Data = TypeVar('Answer_Data',
+                      schema.Answer_Build_Data_Dict,
+                      schema.Answer_Build_Data_Inline_Dict,
+                      schema.Answer_Build_Data,
+                      schema.Answer_Build_Data_Inline)
 
 
 class Answer:
-    def __init__(
-        self,
-    ) -> None:
-        self.builder = Answer_Builder()
-        self.strict_builder = Answer_Builder_Strict()
-        self.inline_builder = Answer_Builder_Inline()
+    def __init__(self):
+        # self.builder = Answer_Builder()
+        self._simple_builder = Markup()
+        self._strict_builder = Markup_Strict()
+        self._inline_builder = Markup_Inline()
 
-    def user_cancel(self, lang="en") -> Message_Back:
-        key = "canceled"
-        btns_text = [key]
+    @staticmethod
+    def _from_dict_to_tuple(
+            data: schema.Answer_Build_Data_Dict | schema.Answer_Build_Data_Inline_Dict
+    ) -> schema.Answer_Build_Data | schema.Answer_Build_Data_Inline:
 
-        return self.builder.build_answer(key, btns_text, lang)
+        if data.get("callback_data"):
+            return schema.Answer_Build_Data_Inline(**data)
+        else:
+            return schema.Answer_Build_Data(**data)
 
-    def confirmed(self, lang="en") -> Message_Back:
-        key = "confirmed"
-        # btns_text = [key]
+    def generate_answer(self, data: Answer_Data,
+                        builder: schema.AnswerBuilder = schema.AnswerBuilder.STRICT) -> schema.MessageDate:
+        if isinstance(data, dict):
+            data = self._from_dict_to_tuple(data)
+        match builder:
+            case schema.AnswerBuilder.SIMPLE:
+                reply_markup = self._simple_builder.buttons(data)
+            case schema.AnswerBuilder.STRICT:
+                reply_markup = self._strict_builder.buttons(data)
+            case schema.AnswerBuilder.INLINE:
+                reply_markup = self._inline_builder.buttons(data)
+            case _:
+                raise Exception("Wrong builder")
+        text = build_message(data.text_key, data.lang, data.injection)
+        return schema.MessageDate(text=text, reply_markup=reply_markup)
+        # if data.injection:
+        #     print(data.injection)
+        #     text = inject_args(text, data.injection)
 
-        return self.strict_builder.build_answer(key, main_menu_btn, lang)
+    # def generate_answer_simple(
+    #     self, text_key: str, btns_text: list[list[str]] | list[str],
+    #     lang="en", injection: dict | None = None
+    # ) -> MessageDate:
+    #
+    # def user_cancel(self, lang="en") -> MessageDate:
+    #     key = "canceled"
+    #     btns_text = [key]
+    #
+    #     return self.builder.build_answer(key, btns_text, lang)
+    #
+    # def confirmed(self, lang="en") -> MessageDate:
+    #     key = "confirmed"
+    #     # btns_text = [key]
+    #
+    #     return self.strict_builder.build_answer(key, main_menu_btn, lang)
+    #
+    # def user_main_menu(self, *, lang="en", canceled=False) -> MessageDate:
+    #     key = "cancel" if canceled else "main_menu"
+    #
+    #     return self.strict_builder.build_answer(key, main_menu_btn, lang)
+    #
+    # def balance(self, lang="en", *args) -> MessageDate:
+    #     key = "balance"
+    #     btns_text = [["deposit", "withdraw"], ["cancel"]]
+    #     return self.strict_builder.build_answer(key, btns_text, lang, *args)
+    #
 
-    def user_main_menu(self, *, lang="en", canceled=False) -> Message_Back:
-        key = "cancel" if canceled else "main_menu"
-
-        return self.strict_builder.build_answer(key, main_menu_btn, lang)
-
-    def balance(self, lang="en", *args) -> Message_Back:
-        key = "balance"
-        btns_text = [["deposit", "withdraw"], ["cancel"]]
-        return self.strict_builder.build_answer(key, btns_text, lang, *args)
-
-    def trade_menu_inline(self, user_id: int, lang="en") -> Message_Back:
-        key = "trade_menu"
-        texts = "new_trade", "buy_coin", "my_trades"
-        values = (
-            {"action": "new_trade", "user_id": user_id},
-            {"action": "buy_coin", "user_id": user_id},
-            {"action": "my_trades", "user_id": user_id},
-        )
-
-        return self.inline_builder.build_answer(
-            callback.Trade_Menu, key, texts, values, lang
-        )
-
-    def confirm_new_order(self, user_id: int, data: dict, lang="en") -> Message_Back:
-        key = "confirm_new_order"
-        texts = "confirm", "cancel"
-        values = (
-            {"action": "confirm", "user_id": user_id},
-            {"action": "cancel", "user_id": user_id},
-        )
-
-        return self.inline_builder.build_answer(
-            callback.Confirm_New_Order, key, texts, values, lang, data=data
-        )
-
-    def cancel_or_hide_active_order(
-        self, user_id: int, order_id: int, lang="en"
-    ) -> t.InlineKeyboardMarkup:
-        ajust = 2
-
-        values = (
-            {"action": "hide", "order_id": order_id, "user_id": user_id},
-            {"action": "cancel", "order_id": order_id, "user_id": user_id},
-        )
-
-        return self.inline_builder.build_kb(
-            callbac_data=callback.Cancel_Active_Order,
-            btns_text=cancel_hide_btn,
-            values_list=values,
-            lang=lang,
-            ajust=ajust,
-        )
+    # def trade_menu_inline(self, user_id: int, lang="en") -> MessageDate:
+    #     key = "trade_menu"
+    #     texts = "new_trade", "buy_coin", "my_trades"
+    #     values = (
+    #         {"action": "new_trade", "user_id": user_id},
+    #         {"action": "buy_coin", "user_id": user_id},
+    #         {"action": "my_trades", "user_id": user_id},
+    #     )
+    #
+    #     return self.inline_builder.build_answer(
+    #         callback.Trade_Menu, key, texts, values, lang
+    #     )
+    #
+    # def confirm_new_order(self, user_id: int, data: dict, lang="en") -> MessageDate:
+    #     key = "confirm_new_order"
+    #     texts = "confirm", "cancel"
+    #     values = (
+    #         {"action": "confirm", "user_id": user_id},
+    #         {"action": "cancel", "user_id": user_id},
+    #     )
+    #
+    #     return self.inline_builder.build_answer(
+    #         callback.Confirm_New_Order, key, texts, values, lang, data=data
+    #     )
+    #
+    # def cancel_or_hide_active_order(
+    #     self, user_id: int, order_id: int, lang="en"
+    # ) -> t.InlineKeyboardMarkup:
+    #     adjust = 2
+    #
+    #     values = (
+    #         {"action": "hide", "order_id": order_id, "user_id": user_id},
+    #         {"action": "cancel", "order_id": order_id, "user_id": user_id},
+    #     )
+    #
+    #     return self.inline_builder.build_kb(
+    #         callbac_data=callback.Cancel_Active_Order,
+    #         btns_text=cancel_hide_btn,
+    #         values_list=values,
+    #         lang=lang,
+    #         adjust=adjust,
+    #     )

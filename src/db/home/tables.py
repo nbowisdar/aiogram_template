@@ -17,7 +17,7 @@ class User(Table, tablename="users"):
     id = BigInt(primary_key=True)
     username = Varchar()
     balance = Float(default=0.0)
-    reg_date = Timestamp(default=datetime.now)
+    reg_date = Timestamp()
     lang = Varchar(default="en", length=10)
     # ban = Integer(default=0)
     # bonus = Float(default=0)
@@ -25,13 +25,13 @@ class User(Table, tablename="users"):
     # transaction_data = Varchar(default="")
 
 
-class Order(Table):
+class Order(Table, tablename="orders"):
     amount_sell = Float()
     percent = Float()
     buyer = ForeignKey(references=User)
     seller = ForeignKey(references=User)
     status = Varchar(default="active")
-    created_at = Timestamp(default=datetime.now)
+    created_at = Timestamp()
 
 
 tables = [User, Order]
@@ -60,12 +60,3 @@ tables = [User, Order]
 #     persent = Float(null=True)
 #     date = Timestamp(default=datetime.now)
 #     msg_id = BigInt(null=True)
-
-
-# class Task(Table):
-#     """
-#     An example table.
-#     """
-
-#     name = Varchar()
-#     completed = Boolean(default=False)

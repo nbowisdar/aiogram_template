@@ -1,9 +1,15 @@
-from typing import NamedTuple
-
+from typing import NamedTuple, TypedDict, Iterable
+from enum import Enum, auto
 from aiogram import types
 from aiogram.filters.callback_data import CallbackData
 
+"""Enums"""
 
+
+class AnswerBuilder(Enum):
+    SIMPLE = auto()
+    STRICT = auto()
+    INLINE = auto()
 
 
 """Other schema"""
@@ -14,9 +20,40 @@ class Text_Data(NamedTuple):
     callback_data: CallbackData
 
 
-class Message_Back(NamedTuple):
+class Answer_Build_Data(NamedTuple):
+    text_key: str
+    btns_text: list[list[str]] | list[str]
+    lang: str
+    injection: dict | None = None
+    adjust: int = None
+
+
+class Answer_Build_Data_Inline(NamedTuple):
+    text_key: str
+    btns_text: list[list[str]] | list[str]
+    lang: str
+    values_list: Iterable[dict]
+    callback_data: CallbackData
+    injection: dict | None = None
+    adjust: int = None
+
+
+class Answer_Build_Data_Dict(TypedDict):
+    text_key: str
+    btns_text: list[list[str]] | list[str]
+    lang: str
+    injection: dict | None = None
+    adjust: int = None
+
+
+class Answer_Build_Data_Inline_Dict(Answer_Build_Data_Dict):
+    values_list: Iterable[dict]
+    callback_data: CallbackData
+
+
+class MessageDate(TypedDict):
     text: str
-    kb: types.InlineKeyboardMarkup | types.ReplyKeyboardMarkup
+    reply_markup: types.InlineKeyboardMarkup | types.ReplyKeyboardMarkup
 
 
 """helper builders"""
@@ -30,7 +67,7 @@ class Text_Data_Builder:
         return Text_Data(text, self.callback_data(**values))
 
     def bulk_build_text_data(
-        self, texts: list[str], values_list: list[dict]
+            self, texts: Iterable[str], values_list: Iterable[dict]
     ) -> list[Text_Data]:
         return [
             self.build_text_data(text, values)
@@ -41,14 +78,14 @@ class Text_Data_Builder:
 class Inline_Builder:
     @staticmethod
     def build_inline_kb(
-        callback_data: CallbackData, text: str, values: dict
+            callback_data: CallbackData, text: str, values: dict
     ) -> Text_Data:
         local_builder = Text_Data_Builder(callback_data)
         return local_builder.build_text_data(text, values)
 
     @staticmethod
     def build_inline_kb_bulk(
-        callback_data: CallbackData, texts: list[str], values_list: list[dict]
+            callback_data: CallbackData, btns_text: Iterable[str], values_list: Iterable[dict]
     ) -> list[Text_Data]:
         local_builder = Text_Data_Builder(callback_data)
-        return local_builder.bulk_build_text_data(texts, values_list)
+        return local_builder.bulk_build_text_data(btns_text, values_list)

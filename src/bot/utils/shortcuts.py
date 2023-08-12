@@ -2,7 +2,7 @@ from aiogram import types as t
 from aiogram.fsm.context import FSMContext
 
 from src.bot.data.answers import Answer
-from src.bot.data.language import formator, messages
+from src.bot.data.language import inject_args, messages
 from src.bot.setup import bot
 from src.db.home.crud import CRUD_Order, CRUD_User
 
@@ -26,6 +26,6 @@ async def send_users_active_trades(user_id: int, lang: str) -> list:
         markup = answer.cancel_or_hide_active_order(user_id, order["id"], lang)
         await bot.send_message(
             user_id,
-            formator(messages["active_order"][lang], order),
+            inject_args(messages["active_order"][lang], order),
             reply_markup=markup,
         )
