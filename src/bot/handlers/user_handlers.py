@@ -101,9 +101,6 @@ async def handle_trade_menu(
 
     match callback_data.action:
         case "new_trade":
-            # msg = build_message_with_values("set_amount", user.lang, [user.balance])
-            # info = answer.user_cancel()
-            # await callback.message.answer(msg, reply_markup=info.kb)
             data = Answer_Build_Data("set_amount", ["cancel"], user.lang, injection={"balance": user.balance})
             resp = answer.generate_answer(data, AnswerEnum.SIMPLE)
             await callback.message.answer(**resp)
@@ -185,9 +182,12 @@ async def set_number(message: t.Message, state: FSMContext):
             {"action": "cancel", "user_id": message.from_user.id}
         ],
         "lang": lang,
-        "callback_data": callback.Trade_Menu
+        "callback_data": callback.Confirm_New_Order
     }
     resp = answer.generate_answer(data_resp, AnswerEnum.INLINE)
+
+    print(resp)
+
     await message.answer(**resp)
     # info = answer.confirm_new_order(message.from_user.id, data, lang)
 
@@ -196,8 +196,8 @@ async def set_number(message: t.Message, state: FSMContext):
 
 #
 #
-# @user_router.callback_query(callback.Confirm_New_Order.filter())
-@user_router.message(NewOrderState.confirm)
+# @user_router.message(NewOrderState.confirm)
+@user_router.callback_query(callback.Confirm_New_Order.filter())
 async def confirm_order(
         callback: t.CallbackQuery,
         callback_data: callback.Confirm_New_Order,
@@ -218,20 +218,21 @@ async def confirm_order(
     resp = answer.generate_answer(Answer_Build_Data(key, main_menu_btn, lang))
     await callback.message.answer(**resp)
 
+
 #
-# @user_router.callback_query(callback.Cancel_Active_Order.filter())
-# async def cancel_hide_order(
-#         callback: t.CallbackQuery, callback_data: callback.Confirm_New_Order
-# ):
-#     user = await cache.get_user_by_id(callback_data.user_id)
-#     if callback_data.action == "cancel":
-#         await crud_order.delete_order(callback_data.order_id)
-#         await callback.message.edit_text(messages["canceled"][user.lang])
-#         logger.debug(
-#             "[User] {} canceled order {}".format(user.username, callback_data.order_id)
-#         )
-#     else:
-#         await callback.message.delete()
+@user_router.callback_query(callback.Cancel_Active_Order.filter())
+async def cancel_hide_order(
+        callback: t.CallbackQuery, callback_data: callback.Cancel_Active_Order
+):
+    user = await cache.get_user_by_id(callback_data.user_id)
+    if callback_data.action == "cancel":
+        await crud_order.delete_order(callback_data.order_id)
+        await callback.message.edit_text(messages["canceled"][user.lang])
+        logger.debug(
+            "[User] {} canceled order {}".format(user.username, callback_data.order_id)
+        )
+    else:
+        await callback.message.delete()
 #
 #
 # @user_router.message(F.text == "test")

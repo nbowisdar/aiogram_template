@@ -19,12 +19,15 @@ def build_message_with_values(key: str, lang: str, values: Iterable) -> str:
 
 def inject_args(text: str, d: dict) -> str:
     for k, v in d.items():
+        print(1)
         text = text.replace(f"${k}", str(v))
+        print(text)
     return text
 
 
 def build_message(key: str, lang: str, injection_data: dict | None = None) -> str:
     msg: str = messages[key][lang]
     if injection_data:
+        print(injection_data)
         return inject_args(msg, injection_data)
     return msg
