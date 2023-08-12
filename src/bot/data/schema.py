@@ -6,7 +6,7 @@ from aiogram.filters.callback_data import CallbackData
 """Enums"""
 
 
-class AnswerBuilder(Enum):
+class AnswerEnum(Enum):
     SIMPLE = auto()
     STRICT = auto()
     INLINE = auto()

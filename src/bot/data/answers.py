@@ -40,7 +40,8 @@ class Markup:
     @classmethod
     def buttons(cls, data: schema.Answer_Build_Data) -> t.ReplyKeyboardMarkup:
         btns_text = cls._set_buttons_text(data.btns_text, data.lang)
-        return build_reply_buttons(btns_text, data.adjust)
+        adj = 1 if not data.adjust else data.adjust
+        return build_reply_buttons(btns_text, adj)
 
 
 class Markup_Strict:
@@ -132,64 +133,28 @@ class Answer:
             return schema.Answer_Build_Data(**data)
 
     def generate_answer(self, data: Answer_Data,
-                        builder: schema.AnswerBuilder = schema.AnswerBuilder.STRICT) -> schema.MessageDate:
+                        builder: schema.AnswerEnum = schema.AnswerEnum.STRICT) -> schema.MessageDate:
         if isinstance(data, dict):
             data = self._from_dict_to_tuple(data)
         match builder:
-            case schema.AnswerBuilder.SIMPLE:
+            case schema.AnswerEnum.SIMPLE:
                 reply_markup = self._simple_builder.buttons(data)
-            case schema.AnswerBuilder.STRICT:
+            case schema.AnswerEnum.STRICT:
                 reply_markup = self._strict_builder.buttons(data)
-            case schema.AnswerBuilder.INLINE:
+            case schema.AnswerEnum.INLINE:
                 reply_markup = self._inline_builder.buttons(data)
             case _:
                 raise Exception("Wrong builder")
         text = build_message(data.text_key, data.lang, data.injection)
         return schema.MessageDate(text=text, reply_markup=reply_markup)
-        # if data.injection:
-        #     print(data.injection)
-        #     text = inject_args(text, data.injection)
 
-    # def generate_answer_simple(
-    #     self, text_key: str, btns_text: list[list[str]] | list[str],
-    #     lang="en", injection: dict | None = None
-    # ) -> MessageDate:
-    #
-    # def user_cancel(self, lang="en") -> MessageDate:
-    #     key = "canceled"
-    #     btns_text = [key]
-    #
-    #     return self.builder.build_answer(key, btns_text, lang)
-    #
     # def confirmed(self, lang="en") -> MessageDate:
     #     key = "confirmed"
     #     # btns_text = [key]
     #
     #     return self.strict_builder.build_answer(key, main_menu_btn, lang)
     #
-    # def user_main_menu(self, *, lang="en", canceled=False) -> MessageDate:
-    #     key = "cancel" if canceled else "main_menu"
-    #
-    #     return self.strict_builder.build_answer(key, main_menu_btn, lang)
-    #
-    # def balance(self, lang="en", *args) -> MessageDate:
-    #     key = "balance"
-    #     btns_text = [["deposit", "withdraw"], ["cancel"]]
-    #     return self.strict_builder.build_answer(key, btns_text, lang, *args)
-    #
 
-    # def trade_menu_inline(self, user_id: int, lang="en") -> MessageDate:
-    #     key = "trade_menu"
-    #     texts = "new_trade", "buy_coin", "my_trades"
-    #     values = (
-    #         {"action": "new_trade", "user_id": user_id},
-    #         {"action": "buy_coin", "user_id": user_id},
-    #         {"action": "my_trades", "user_id": user_id},
-    #     )
-    #
-    #     return self.inline_builder.build_answer(
-    #         callback.Trade_Menu, key, texts, values, lang
-    #     )
     #
     # def confirm_new_order(self, user_id: int, data: dict, lang="en") -> MessageDate:
     #     key = "confirm_new_order"

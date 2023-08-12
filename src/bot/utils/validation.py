@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Type
 
 
 def check_mobile_number(value: any) -> bool | str:
@@ -10,7 +10,7 @@ def check_mobile_number(value: any) -> bool | str:
     return value
 
 
-def simple_check_digit(value: any, t: int | float) -> int | float:
+def simple_check_digit(value: any, t: Type[int] | Type[float]) -> int | float:
     try:
         if t == int:
             return int(value)
@@ -22,7 +22,7 @@ def simple_check_digit(value: any, t: int | float) -> int | float:
 
 
 def check_digit_or_function(
-    value: any, t: int | float, func: Callable, *args, **kwargs
+        value: any, t: int | float, func: Callable, *args, **kwargs
 ) -> Any:
     try:
         if t == int:
@@ -35,7 +35,7 @@ def check_digit_or_function(
 
 
 async def async_check_digit_or_function(
-    value: any, t: int | float, func: Callable, *args, **kwargs
+        value: any, t: int | float, func: Callable, *args, **kwargs
 ) -> Any:
     try:
         if t == int:

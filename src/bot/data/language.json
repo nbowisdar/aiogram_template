@@ -31,9 +31,9 @@
       "ua": "Ваш баланс - {} $"
     },
     "set_amount": {
-      "en": "Set amount from 10 to {}",
-      "ru": "Установить количество 10 to {}",
-      "ua": "Встановити кількість 10 to {}"
+      "en": "Set amount from 10 to $balance",
+      "ru": "Установить количество 10 to $balance",
+      "ua": "Встановити кількість 10 to $balance"
     },
     "set_percentage": {
       "en": "Please, enter the percentage of the increase from 1 to 15%",
